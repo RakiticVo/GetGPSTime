@@ -22,6 +22,8 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -98,11 +100,23 @@ public class MainActivity extends AppCompatActivity {
                 location = mlocation;
 //                Toast.makeText(context, ""+location.getTime(), Toast.LENGTH_SHORT).show();
 //                Log.e("TAG", "onReceive: " + location.getLatitude() + "--" + location.getLongitude());
-                tv_show_time.setText(""+location.getTime());
-                
+
+                String time = getDate(location.getTime(), "dd/MM/yyyy hh:mm:ss:SSS");
+                tv_show_time.setText(""+ time);
             }
             Toast.makeText(context, "Vị trí: " + location.getLatitude() + "--" + location.getLongitude(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static String getDate(long milliSeconds, String dateFormat)
+    {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
     }
 
     @Override
