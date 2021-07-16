@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,18 +24,20 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     // to get location permissions.
     private final static int LOCATION_REQUEST_CODE = 23;
     boolean locationPermission = false;
-
+    private int delay ;
     private android.location.Location location;
     private LocationBroadcastReceiver receiver;
-    TextView tv_show_time, tv_show_Device_time , tv_show_my_time;
+    TextView tv_show_time, tv_show_Device_time, tv_show_my_time , tv_show_my_time2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +46,10 @@ public class MainActivity extends AppCompatActivity {
         receiver = new LocationBroadcastReceiver();
         tv_show_time = findViewById(R.id.tv_show_time_GPS);
         tv_show_Device_time = findViewById(R.id.tv_show_time_NTP);
-        tv_show_my_time = findViewById(R.id.tv_show_time_MyClock);
+        tv_show_my_time = findViewById(R.id.tv_show_time_MyTime);
+      //  tv_show_my_time2 = findViewById(R.id.tv_show_time_MyTime2);
         // request location permission.
         requestPermision();
-
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (Build.VERSION.SDK_INT >= 23) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -55,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+
+        //
+        InitialiseLocationListener(getApplicationContext());
 //        updateLocation();
     }
 
@@ -66,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, GPSServices.class);
         startService(intent);
     }
-
     private void requestPermision() {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -78,8 +83,7 @@ public class MainActivity extends AppCompatActivity {
             locationPermission = true;
         }
     }
-
-    private void buildAlertMessageNoLocation(){
+    private void buildAlertMessageNoLocation() {
         new AlertDialog.Builder(this)
                 .setMessage("Your Location seems to be disabled, do you want to enable it?")
                 .setPositiveButton("Settings", new
@@ -101,18 +105,81 @@ public class MainActivity extends AppCompatActivity {
             if (intent.getAction().equals("ACT_LOC")) {
                 Location mlocation = intent.getParcelableExtra("lastLocation");
                 location = mlocation;
-//                Toast.makeText(context, ""+location.getTime(), Toast.LENGTH_SHORT).show();
-//                Log.e("TAG", "onReceive: " + location.getLatitude() + "--" + location.getLongitude());
-
-                String time = getDate(location.getTime(), "dd/MM/yyyy hh:mm:ss:SSS");
-                tv_show_time.setText(""+ time);
-
+                String time = getDate(location.getTime(), "hh:mm:ss");
+                Date currentTime = Calendar.getInstance().getTime();
+                DateFormat df = new SimpleDateFormat("hh:mm:ss");
+                String timeDevide = df.format(currentTime);
+                tv_show_time.setText("GPS GET SERVER: " + time);
+                tv_show_Device_time.setText("DEVICE: " + timeDevide);
 
             }
-            Toast.makeText(context, "Vị trí: " + location.getLatitude() + "--" + location.getLongitude(), Toast.LENGTH_SHORT).show();
         }
     }
 
+    public void InitialiseLocationListener(android.content.Context context) {
+        LocationManager locationManager = (android.location.LocationManager)
+                context.getSystemService(android.content.Context.LOCATION_SERVICE);
+        LocationListener locationListener = new android.location.LocationListener() {
+            public void onLocationChanged(android.location.Location location) {
+                String time = new java.text.SimpleDateFormat("HH:mm:ss").format(location.getTime());
+                if (location.getProvider().equals(android.location.LocationManager.GPS_PROVIDER))
+                {
+                 //   Log.e("Location", "Time GPS: " + time); // This is what we want!
+                    tv_show_my_time.setText("GPS Time And Delay :" + time);
+                    delay = delayTime(time);
+                }
+                else
+                {
+               //     Log.e("Location", "Time Device (" + location.getProvider() + "): " + time);
+                    String mTime = uploadTime(location.getTime(),delay);
+                    tv_show_my_time.setText("GPS Time And Delay :" + mTime);
+                }
+            }
+        };
+
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
+        locationManager.requestLocationUpdates(android.location.LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+        // Note: To Stop listening use: locationManager.removeUpdates(locationListener)
+    }
+    // Tính Delay
+    public int delayTime(String time)
+    {
+        Date currentTime = Calendar.getInstance().getTime();
+        DateFormat df = new SimpleDateFormat("ss");
+        String timeDevide = df.format(currentTime);
+        String a[] =  time.split(":");
+        int delay = Integer.parseInt(a[2]) - Integer.parseInt(timeDevide);
+        Log.e("Log", "Vao delayTime :"+ delay);
+        if (delay >  0)
+        {
+            return delay;
+        }
+        else return 0;
+    }
+    // Update time when GPS Time is not working
+    public static String uploadTime(long milliSeconds, int delay)
+    {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        int mdelay = delay * 1000 ;
+        calendar.setTimeInMillis(milliSeconds + mdelay);
+      //  Log.e("Log" , "Delay : " +mdelay + " | " + delay);
+        return formatter.format(calendar.getTime());
+    }
+    // Convert Time
     public static String getDate(long milliSeconds, String dateFormat)
     {
         // Create a DateFormatter object for displaying date in specified format.
@@ -122,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
     }
-
     @Override
     protected void onStop() {
         super.onStop();
