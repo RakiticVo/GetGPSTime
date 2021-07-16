@@ -21,6 +21,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,19 +36,25 @@ public class MainActivity extends AppCompatActivity {
     // to get location permissions.
     private final static int LOCATION_REQUEST_CODE = 23;
     boolean locationPermission = false;
-    private int delay ;
+    private int delay;
     private android.location.Location location;
     private LocationBroadcastReceiver receiver;
-    TextView tv_show_time, tv_show_Device_time, tv_show_my_time , tv_show_my_time2;
+    TextView tv_show_time_GPS, tv_show_Device_time, tv_show_time_LocationListener , tv_show_time_delay_locationListener, tv_show_time_delay_service, tv_show_time_Service;
+    LinearLayout layout_solution_1, layout_solution_2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         receiver = new LocationBroadcastReceiver();
-        tv_show_time = findViewById(R.id.tv_show_time_GPS);
+        tv_show_time_GPS = findViewById(R.id.tv_show_time_GPS);
         tv_show_Device_time = findViewById(R.id.tv_show_time_NTP);
-        tv_show_my_time = findViewById(R.id.tv_show_time_MyTime);
+        tv_show_time_LocationListener = findViewById(R.id.tv_show_time_LocationListener);
+        tv_show_time_delay_locationListener = findViewById(R.id.tv_show_time_delay_locationListener);
+        tv_show_time_delay_service = findViewById(R.id.tv_show_time_delay_service);
+        tv_show_time_Service = findViewById(R.id.tv_show_time_Service);
+        layout_solution_1 = findViewById(R.id.layout_solution_1);
+        layout_solution_2 = findViewById(R.id.layout_solution_2);
       //  tv_show_my_time2 = findViewById(R.id.tv_show_time_MyTime2);
         // request location permission.
         requestPermision();
@@ -60,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //
-        InitialiseLocationListener(getApplicationContext());
+//        InitialiseLocationListener(getApplicationContext());
 //        updateLocation();
     }
 
@@ -109,56 +117,60 @@ public class MainActivity extends AppCompatActivity {
                 Date currentTime = Calendar.getInstance().getTime();
                 DateFormat df = new SimpleDateFormat("hh:mm:ss");
                 String timeDevide = df.format(currentTime);
-                tv_show_time.setText("GPS GET SERVER: " + time);
+                tv_show_time_GPS.setText("GPS GET SERVER: " + time);
                 tv_show_Device_time.setText("DEVICE: " + timeDevide);
-
+                Log.e("TAG2", "onLocationChanged: " + location.getProvider() );
+                //   Log.e("Location", "Time GPS: " + time); // This is what we want!
+                tv_show_time_Service.setText("GPS Time And Delay :" + time);
+                delay = delayTime(time, currentTime);
+                tv_show_time_delay_service.setText(delay+"");
+                layout_solution_2.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    public void InitialiseLocationListener(android.content.Context context) {
-        LocationManager locationManager = (android.location.LocationManager)
-                context.getSystemService(android.content.Context.LOCATION_SERVICE);
-        LocationListener locationListener = new android.location.LocationListener() {
-            public void onLocationChanged(android.location.Location location) {
-                String time = new java.text.SimpleDateFormat("HH:mm:ss").format(location.getTime());
-                if (location.getProvider().equals(android.location.LocationManager.GPS_PROVIDER))
-                {
-                 //   Log.e("Location", "Time GPS: " + time); // This is what we want!
-                    tv_show_my_time.setText("GPS Time And Delay :" + time);
-                    delay = delayTime(time);
-                }
-                else
-                {
-               //     Log.e("Location", "Time Device (" + location.getProvider() + "): " + time);
-                    String mTime = uploadTime(location.getTime(),delay);
-                    tv_show_my_time.setText("GPS Time And Delay :" + mTime);
-                }
-            }
-        };
-
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        locationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
-        locationManager.requestLocationUpdates(android.location.LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
-        // Note: To Stop listening use: locationManager.removeUpdates(locationListener)
-    }
+//    public void InitialiseLocationListener(android.content.Context context) {
+//        LocationManager locationManager = (android.location.LocationManager)
+//                context.getSystemService(android.content.Context.LOCATION_SERVICE);
+//        LocationListener locationListener = new android.location.LocationListener() {
+//            public void onLocationChanged(android.location.Location location) {
+//                Date currentTime = Calendar.getInstance().getTime();
+//                String time = new java.text.SimpleDateFormat("HH:mm:ss").format(location.getTime());
+//                Log.e("TAG2", "onLocationChanged: " + location.getProvider() );
+//                if (location.getProvider().equals(android.location.LocationManager.GPS_PROVIDER))
+//                {
+//                 //   Log.e("Location", "Time GPS: " + time); // This is what we want!
+//                    tv_show_time_LocationListener.setText("GPS Time And Delay :" + time);
+//                    delay = delayTime(time, currentTime);
+//                    tv_show_time_delay_locationListener.setText(delay+"");
+//                }
+//                else
+//                {
+//               //     Log.e("Location", "Time Device (" + location.getProvider() + "): " + time);
+//                    String mTime = uploadTime(location.getTime(),delay);
+//                    tv_show_time_LocationListener.setText("GPS Time And Delay :" + mTime);
+//                    tv_show_time_delay_locationListener.setText(delay+"");
+//                }
+//                layout_solution_1.setVisibility(View.VISIBLE);
+//            }
+//        };
+//
+//
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+//        locationManager.requestLocationUpdates(android.location.LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
+//        locationManager.requestLocationUpdates(android.location.LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+//        // Note: To Stop listening use: locationManager.removeUpdates(locationListener)
+//    }
     // Tính Delay
-    public int delayTime(String time)
+    public int delayTime(String time, Date currentTime)
     {
-        Date currentTime = Calendar.getInstance().getTime();
         DateFormat df = new SimpleDateFormat("ss");
         String timeDevide = df.format(currentTime);
         String a[] =  time.split(":");
+        Log.e("TAG3", ""+time);
+        Log.e("TAG3", ""+timeDevide);
         int delay = Integer.parseInt(a[2]) - Integer.parseInt(timeDevide);
         Log.e("Log", "Vao delayTime :"+ delay);
         if (delay >  0)

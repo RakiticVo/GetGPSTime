@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".MainActivity">
         <LinearLayout
             android:orientation="vertical"
@@ -13,6 +14,7 @@
             android:layout_height="wrap_content">
                 <TextView
                     android:text="Thời gian lấy từ service"
+                    android:textSize="22sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
@@ -22,7 +24,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Time"
-                    android:textSize="15sp" />
+                    android:textSize="22sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -32,6 +34,7 @@
             android:layout_height="wrap_content">
                 <TextView
                     android:text="Thời gian lấy từ Hệ thống"
+                    android:textSize="22sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <TextView
@@ -41,26 +44,104 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Time"
-                    android:textSize="15sp" />
+                    android:textSize="22sp" />
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="30dp"
-            android:orientation="vertical"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-                <TextView
-                    android:text="Thời gian lấy LocationListener và xử lý delay"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:layout_marginTop="10dp"
-                    android:id="@+id/tv_show_time_MyTime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:text="Time"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-        </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/layout_solution_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+                        <LinearLayout
+                            android:layout_marginTop="30dp"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Thời gian delay của LocationListener"
+                                    android:textSize="22sp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+                                <TextView
+                                    android:layout_marginTop="10dp"
+                                    android:id="@+id/tv_show_time_delay_locationListener"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="40dp"
+                                    android:text="Time"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="30dp"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Thời gian lấy của LocationListener và xử lý delay"
+                                    android:textSize="22sp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+                                <TextView
+                                    android:layout_marginTop="10dp"
+                                    android:id="@+id/tv_show_time_LocationListener"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="40dp"
+                                    android:text="Time"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+                        </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_solution_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+                        <LinearLayout
+                            android:layout_marginTop="30dp"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Thời gian delay của Service"
+                                    android:textSize="22sp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+                                <TextView
+                                    android:layout_marginTop="10dp"
+                                    android:id="@+id/tv_show_time_delay_service"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="40dp"
+                                    android:text="Time"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_marginTop="30dp"
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                                <TextView
+                                    android:text="Thời gian lấy của Service và xử lý delay"
+                                    android:textSize="22sp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+                                <TextView
+                                    android:layout_marginTop="10dp"
+                                    android:id="@+id/tv_show_time_Service"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="40dp"
+                                    android:text="Time"
+                                    android:textSize="22sp"
+                                    android:textStyle="bold" />
+                        </LinearLayout>
+                </LinearLayout>
+        </RelativeLayout>
 
 </LinearLayout>
